@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#203b31">
+<title>Unser LEGO-Adventskalender 🎄</title>
+<style>
+:root{--green:#203b31;--green2:#315443;--cream:#fff8eb;--gold:#d6b878;--red:#a84e43;--ink:#25342b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;background:radial-gradient(circle at top,#426b54 0,#203b31 52%,#172a23 100%);color:var(--cream);min-height:100vh}
+main{max-width:850px;margin:0 auto;padding:34px 18px 56px}
+.hero{text-align:center;padding:24px 10px 28px}
+.eyebrow{letter-spacing:.22em;text-transform:uppercase;font:12px Arial,sans-serif;color:#e8d5a8}
+h1{font-size:clamp(2rem,7vw,3.6rem);font-weight:normal;line-height:1.05;margin:14px 0}
+.subtitle{font:15px/1.7 Arial,sans-serif;color:#e8eee7;max-width:520px;margin:0 auto}
+.rule{width:90px;height:1px;background:var(--gold);margin:22px auto}
+#status{font:13px Arial,sans-serif;color:#e8d5a8;margin-top:16px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.door{border:1px solid rgba(232,213,168,.65);border-radius:12px;min-height:100px;background:linear-gradient(145deg,#42634d,#2a4738);color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:0 5px 0 rgba(0,0,0,.13);cursor:pointer;transition:transform .15s,background .15s;padding:10px}
+.door:not(:disabled):hover{transform:translateY(-3px);background:linear-gradient(145deg,#55785e,#315443)}
+.door:disabled{cursor:not-allowed;opacity:.58;background:#2c4035}
+.number{font-size:30px;line-height:1}
+.door small{font:10px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.door.today{border:2px solid var(--gold);box-shadow:0 0 0 2px rgba(214,184,120,.16),0 5px 0 rgba(0,0,0,.13)}
+footer{text-align:center;font:12px/1.6 Arial,sans-serif;color:#cbd8ce;margin-top:30px}
+.modal{position:fixed;inset:0;background:rgba(9,20,15,.78);display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal.open{display:flex}
+.panel{background:var(--cream);color:var(--ink);border-radius:18px;max-width:520px;width:100%;padding:26px;position:relative;box-shadow:0 18px 70px #0006}
+.panel h2{font-size:27px;font-weight:normal;margin:0 30px 12px 0}
+.panel p{font:15px/1.6 Arial,sans-serif}
+.close{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:27px;cursor:pointer;color:var(--ink)}
+.pdf{display:inline-block;background:var(--green);color:white;text-decoration:none;padding:12px 17px;border-radius:8px;font:14px Arial,sans-serif;margin-top:6px}
+.note{font-size:12px!important;color:#58675c}
+@media(max-width:480px){.grid{gap:8px}.door{min-height:82px;padding:7px}.number{font-size:25px}.door small{font-size:9px}main{padding-top:22px}}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">Für dich · 24 kleine Überraschungen</div>
+    <h1>Adventskalender 2026</h1>
+    <div class="rule"></div>
+    <p class="subtitle">Jeden Tag ein kleines Stück näher am großen Ganzen. Öffne jeden Tag ein Türchen und entdecke deinen nächsten Bauabschnitt. ❤️</p>
+    <div id="status" aria-live="polite"></div>
+  </header>
+  <section class="grid" id="calendar" aria-label="Adventskalender"></section>
+  <footer>Mit Liebe zusammengestellt ❤️<br>Die Türchen öffnen sich ab dem 1. Dezember nach und nach.</footer>
+</main>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="panel">
+    <button class="close" id="close" aria-label="Schließen">×</button>
+    <h2 id="modalTitle">Türchen</h2>
+    <p id="message"></p>
+    <a id="pdfLink" class="pdf" href="#" target="_blank" rel="noopener">🎁 Bauanleitung öffnen (PDF)</a>
+    <p class="note">Tipp: Öffne die PDF und speichere sie, falls du sie später offline ansehen möchtest.</p>
+  </div>
+</div>
+<script>
+/* Kalenderjahr: bei Bedarf anpassen. */
+const YEAR = 2026;
+/* Persönliche Texte pro Tag – ändere sie gern. */
+const messages = [
+"Los geht’s! Hier ist der erste kleine Teil deiner Überraschung. ❤️",
+"Tag 2 – ein weiteres Stück auf dem Weg zum großen Ganzen!",
+"Ein kleines Türchen, ein paar neue Teile und ein bisschen Vorfreude.",
+"Schon vier Tage näher am fertigen Set. Viel Spaß beim Bauen!",
+"Eine kleine Baupause vom Alltag – nur für dich.",
+"Der Nikolaus bringt heute vielleicht keine Schokolade, aber LEGO-Teile!",
+"Ein weiterer Schritt. Ich bin gespannt, wie es am Ende aussieht.",
+"Halbzeit ist noch nicht, aber dein Set wächst schon!",
+"Ein paar Teile mehr für deine Sammlung.",
+"Tag 10! Langsam nimmt dein Projekt Gestalt an.",
+"Ich hoffe, du hast genauso viel Freude daran wie ich beim Vorbereiten.",
+"12 Türchen – und jede Menge Vorfreude auf das Finale.",
+"Die Hälfte ist geschafft. Weiter geht’s!",
+"Ein kleiner Bauabschnitt nur für dich.",
+"Das fertige Set kommt jeden Tag näher.",
+"16. Dezember – dein LEGO-Projekt wächst weiter.",
+"Noch ein paar Tage bis zum großen Finale!",
+"Ein weiteres Päckchen voller Baustein-Vorfreude.",
+"Jetzt sind es nur noch wenige Türchen.",
+"Die Zielgerade beginnt – viel Spaß mit dem heutigen Abschnitt!",
+"Noch vier Tage bis Weihnachten. ❤️",
+"Fast geschafft! Dein Set wird immer vollständiger.",
+"Vorletztes Türchen – morgen kommt das Finale!",
+"Frohe Weihnachten! Jetzt ist dein LEGO-Set komplett. Ich wünsche dir ganz viel Freude damit! ❤️"
+];
+const calendar = document.getElementById("calendar");
+const status = document.getElementById("status");
+const today = new Date();
+today.setHours(0,0,0,0);
+const start = new Date(YEAR, 11, 1);
+const end = new Date(YEAR, 11, 24);
+const openedThrough = today < start ? 0 : today > end ? 24 : today.getDate();
+status.textContent = today < start
+  ? `Die erste Überraschung wartet ab dem 1. Dezember ${YEAR} auf dich.`
+  : today > end
+  ? "Alle 24 Türchen sind geöffnet – frohe Weihnachten! 🎄"
+  : `Heute kannst du Türchen ${openedThrough} öffnen. Viel Freude!`;
+for(let day=1;day<=24;day++){
+  const button=document.createElement("button");
+  button.className="door"+(day===openedThrough?" today":"");
+  button.disabled=day>openedThrough;
+  button.setAttribute("aria-label",`Türchen ${day}${button.disabled?", noch verschlossen":", öffnen"}`);
+  button.innerHTML=`<span class="number">${day}</span><small>${day>openedThrough?"🔒 Bald":"✦ Öffnen"}</small>`;
+  button.addEventListener("click",()=>{
+    document.getElementById("modalTitle").textContent=`Türchen ${day} 🎄`;
+    document.getElementById("message").textContent=messages[day-1] || "Viel Spaß mit deinem heutigen Bauabschnitt!";
+    const link=document.getElementById("pdfLink");
+    link.href=`anleitung/tag-${String(day).padStart(2,"0")}.pdf`;
+    link.textContent=day===24?"🎁 Letzte Bauanleitung öffnen (PDF)":"🎁 Bauanleitung öffnen (PDF)";
+    document.getElementById("modal").classList.add("open");
+  });
+  calendar.appendChild(button);
+}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+document.getElementById("close").addEventListener("click",closeModal);
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+</script>
+</body>
+</html>
